@@ -30,8 +30,6 @@ class plantomat {
     }
 
     newSelection(selection, scope) {
-        console.log(selection)
-
         scope.convertCanny(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1);
     }
 
@@ -179,6 +177,19 @@ class rectSelect{
         var that = e.data;
 
         if(that.mouseupFcn !== null) {
+            //correct if square is not done left to right
+            if (that.rect.x1 > that.rect.x2) {
+                var tmp = that.rect.x1;
+                that.rect.x1 = that.rect.x2;
+                that.rect.x2 = tmp;
+            }
+            //correct if square is not done top to bottom
+            if (that.rect.y1 > that.rect.y2) {
+                var tmp = that.rect.y1;
+                that.rect.y1 = that.rect.y2;
+                that.rect.y2 = tmp;
+            }
+
             //correct the 0 point of the rectangle to be relative to the elmId
             that.rect.x1 = that.rect.x1 - that.refElm.x1
             that.rect.x2 = that.rect.x2 - that.refElm.x1
