@@ -4,11 +4,14 @@ class plantomat {
     ctx = Object
     imgUrl = ""
     selector = Object
+    img = Object
 
     constructor(imgUrl){
         console.log("start plantomat");
         this.imgUrl = imgUrl;
-
+        this.img = new Image()
+        
+        this.img.src = this.imgUrl;
     } 
 
     calc(ctxId) {
@@ -28,21 +31,18 @@ class plantomat {
         console.log("test");
     }
 
-    loadImage() {
-        var img = new Image()
-        
-        img.src = this.imgUrl;
+    loadImage() {      
 
         
-        this.ctxObj.width = img.naturalWidth;
-        this.ctxObj.height = img.naturalHeight;    
+        this.ctxObj.width = this.img.naturalWidth;
+        this.ctxObj.height = this.img.naturalHeight;    
 
 
         //draw original to canvas
         this.ctx = this.ctxObj.getContext('2d');
         this.ctx.fillStyle = "rgb(0,255,0)";
         this.ctx.strokeStyle = "rgb(0,255,0)";
-        this.ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, img.naturalWidth, img.naturalHeight);
+        this.ctx.drawImage(this.img, 0, 0, this.img.naturalWidth, this.img.naturalHeight, 0, 0, this.img.naturalWidth, this.img.naturalHeight);
 
     }
 
