@@ -181,7 +181,9 @@ class rectSelect{
         if(that.mouseupFcn !== null) {
             //correct the 0 point of the rectangle to be relative to the elmId
             that.rect.x1 = that.rect.x1 - that.refElm.x1
+            that.rect.x2 = that.rect.x2 - that.refElm.x1
             that.rect.y1 = that.rect.y1 - that.refElm.y1
+            that.rect.y2 = that.rect.y2 - that.refElm.y1
 
             that.mouseupFcn.ptr(that.rect, that.mouseupFcn.scope);
         }
