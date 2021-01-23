@@ -26,15 +26,13 @@ class plantomat {
         
         this.loadImage();
         this.selector = new rectSelect(ctxId);
+        this.selector.attachMouseupFcn(this.newSelection, this);
+    }
 
-        var startX = 500;
-        var startY = 1500;
-        var width = 500;
-        var height = 500;
+    newSelection(selection, scope) {
+        console.log(selection)
 
-        this.convertCanny(startX, startY, width, height)
-
-        console.log("test");
+        scope.convertCanny(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1);
     }
 
     loadImage() {      
@@ -55,6 +53,11 @@ class plantomat {
     
 
     convertCanny(startX, startY, width, height) {
+        startX = Math.round(startX);
+        startY = Math.round(startY);
+        width = Math.round(width);
+        height = Math.round(height);
+
 
         var img_u8 = new jsfeat.matrix_t(width, height, jsfeat.U8C1_t);
        
@@ -69,20 +72,23 @@ class plantomat {
 
         jsfeat.imgproc.gaussian_blur(img_u8, img_u8, kernel_size, 0);
 
-        jsfeat.imgproc.canny(img_u8, img_u8, 0, 15);
+        jsfeat.imgproc.canny(img_u8, img_u8, 0, 12.5);
 
         // render result back to canvas
         var data_u32 = new Uint32Array(imageData.data.buffer);
         var alpha = (0xff << 24);
         var i = img_u8.cols*img_u8.rows, pix = 0;
+        var black = 0
         while(--i >= 0) {
             pix = img_u8.data[i];
             if(pix != 0){
                 data_u32[i] = alpha;
+                black ++;
             }else
                 data_u32[i] = 0;//alpha | (pix << 16) | (pix << 8) | pix;
             
         }
+        console.log("Black:" + black);
         this.ctx.putImageData(imageData, startX, startY);
 
 
@@ -97,20 +103,104 @@ class analyzer{
 
 
 class rectSelect{
+    
+    rect = {x1 : 0, x2 : 0, y1 : 0, y2 : 0}
+    refElm = {x1 : 0, x2 : 0, y1 : 0, y2 : 0}
+    rectDomObj = Object
+    mouseupFcn = null
 
     constructor(elmId) {
-        var divHandle = $('<div />').appendTo('body');
-        divHandle.attr('id', 'rectSelect');
-        divHandle.css("border", "1px solid red");
+        this.rectDomObj = $('<div />').appendTo('body');
+        this.rectDomObj.attr('id', 'rectSelect');
+        this.rectDomObj.css("border", "1px solid red");
+        this.rectDomObj.css("position", "absolute");
+        this.rectDomObj.hide();
 
-        $("#" + elmId).on("click", function(e){alert("test")});
+        
+
+        $(document).mousedown(this, this.mousedown);
+        $(document).mouseup(this, this.mouseup);
+        $(document).mousemove(this, this.mousemove);
+
+        this.calcRefElmSize(elmId)
 
 
     }
 
-
-    mousedown() {
-        console.log("mousdown")
+    //attach a function to be called on mouseup
+    attachMouseupFcn(fcnPtr , scope){
+        this.mouseupFcn = {"ptr" : fcnPtr, "scope" : scope}
     }
+
+    //calculate the abs coordinates of the reference element (elmId)
+    calcRefElmSize(elmId) {
+
+        var offset = $("#" + elmId).offset();
+
+        this.refElm.x1 = offset.left
+        this.refElm.x2 = offset.left + $("#" + elmId).width();
+        this.refElm.y1 = offset.top
+        this.refElm.y2 = offset.top + $("#" + elmId).height();
+    }
+
+    //check if mouse is outside the reference elm (elmId from constructor)
+    checkRefElmPos(x , y) {
+        if (x < this.refElm.x1 || x > this.refElm.x2 || y < this.refElm.y1 || y > this.refElm.y2 )
+            return false;
+        return true;
+    }
+
+    //calc a new div whis the current pos
+    calcDiv() {
+        var x3 = Math.min(this.rect.x1,this.rect.x2);
+        var x4 = Math.max(this.rect.x1,this.rect.x2);
+        var y3 = Math.min(this.rect.y1,this.rect.y2);
+        var y4 = Math.max(this.rect.y1,this.rect.y2);
+
+        this.rectDomObj.css("left", x3 + 'px');
+        this.rectDomObj.css("top", y3 + 'px');
+        this.rectDomObj.css("width", x4 - x3 + 'px');
+        this.rectDomObj.css("height",  y4 - y3 + 'px');
+    }
+
+    mousedown(e) {
+        var that = e.data;
+
+        that.rect.x1 = e.clientX + $(document).scrollLeft();
+        that.rect.y1 = e.clientY + $(document).scrollTop();
+
+        that.calcDiv();
+        that.rectDomObj.show();
+
+
+    }
+
+    mouseup(e) {
+        var that = e.data;
+
+        if(that.mouseupFcn !== null) {
+            //correct the 0 point of the rectangle to be relative to the elmId
+            that.rect.x1 = that.rect.x1 - that.refElm.x1
+            that.rect.y1 = that.rect.y1 - that.refElm.y1
+
+            that.mouseupFcn.ptr(that.rect, that.mouseupFcn.scope);
+        }
+
+        that.rect = {x1 : 0, x2 : 0, y1 : 0, y2 : 0};
+        that.rectDomObj.hide();
+    }
+
+    mousemove(e) {
+        var that = e.data;
+
+        if (! that.checkRefElmPos(e.clientX, e.clientY))
+            return
+
+        that.rect.x2 = e.clientX + $(document).scrollLeft();
+        that.rect.y2 = e.clientY + $(document).scrollTop();
+        that.calcDiv();
+
+    }
+
 
 }
