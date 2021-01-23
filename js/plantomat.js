@@ -1,3 +1,9 @@
+// Copyright (c) 2020 Manuel Pitz, RWTH Aachen University
+//
+// Licensed under the MIT license <LICENSE-MIT or
+// http://opensource.org/licenses/MIT>. This file may not be
+// copied, modified, or distributed except according to those terms.
+
 
 class plantomat {
     ctxObj = Object
@@ -93,7 +99,13 @@ class analyzer{
 class rectSelect{
 
     constructor(elmId) {
+        var divHandle = $('<div />').appendTo('body');
+        divHandle.attr('id', 'rectSelect');
+        divHandle.css("border", "1px solid red");
+
         $("#" + elmId).on("click", function(e){alert("test")});
+
+
     }
 
 
