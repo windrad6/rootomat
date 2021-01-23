@@ -1,0 +1,3 @@
+[submodule "submodules/jsfeat"]
+	path = submodules/jsfeat
+	url = https://github.com/inspirit/jsfeat.git

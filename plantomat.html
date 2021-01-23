@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="module" src="./submodules/jsfeat/build/jsfeat.js"></script>
+    <script type="text/javascript" src="./js/plantomat.js"></script>
+    <script type="text/javascript">
+        var plantomatObj = Object;
+        var test = Object;
+
+        $( document ).ready(function() {
+            plantomatObj = new plantomat("./test.jpg");
+        })
+    </script>
+</head>
+<body>
+    <button onclick="plantomatObj.calc('outImg')">Calc</button><br />
+    <!--<img id="inputImg" style="width:400px" src="./test.jpg">-->
+    <canvas id="outImg"></canvas>
+    
+</body>
+</html>
