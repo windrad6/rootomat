@@ -14,9 +14,31 @@
     </script>
 </head>
 <body>
-    <button onclick="plantomatObj.init('image','edges')">Calc</button><br />
-    <!--<img id="inputImg" style="width:400px" src="./test.jpg">-->
-    <canvas id="image"></canvas>
-    <canvas id="edges" style="position:absolute"></canvas>
+    <div id ="placeholder" style="height: 100px;">&nbsp;</div>
+    <div id = "controls" style="height: 100px; position: fixed; top: 0; left: 0;background-color: white; z-index:10; width: 100%;">
+        <div style="float: left;">
+            <button onclick="plantomatObj.init('image','edges')">Load image</button><br />
+            <button onclick="plantomatObj.getEdgePxCount()">Calc pixel</button><br />
+
+        </div>
+        <div style="float: left;">
+        Touch enable<div id="touchEn" style="background-color: red; width: 50px;">&nbsp;</div>
+        Scroll enable<div id="scrollEn" style="background-color: green; width: 50px;">&nbsp;</div>
+        </div>
+        <div style="float: left;">
+            Current pos<div id="currentPos"></div>
+            Eraser enable<div id="eraseEn" style="background-color: red; width: 50px;">&nbsp;</div>
+        </div>
+        <div style="float: left; border: solid black 1px">
+        Last square:&nbsp;<div id="lastEdgePixel"></div>
+        All:&nbsp;<div id="allEdgePixel"></div>
+        </div>
+        <div style="clear: left;"></div>
+    </div>
+
+    <div id="canvasContainer" style="z-index: 5;">
+        <canvas id="image"></canvas>
+        <canvas id="edges" style="position:absolute"></canvas>
+    </div>
 </body>
 </html>

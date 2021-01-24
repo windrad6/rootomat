@@ -73,7 +73,8 @@ class plantomat {
             if (pixel != 0)
                 edgePx ++;
         }
-        console.log("Total edge pixel: " + edgePx);
+        $("#allEdgePixel").html(edgePx);
+        //console.log("Total edge pixel: " + edgePx);
     }
 
     convertCanny(startX, startY, width, height) {
@@ -112,6 +113,7 @@ class plantomat {
                 data_u32[i] = 0;//alpha | (pix << 16) | (pix << 8) | pix;
             
         }
+        $("#lastEdgePixel").html(black);
         console.log("Black:" + black);
 
         this.edgeCtx.putImageData(imageData, startX, startY);
@@ -133,24 +135,58 @@ class rectSelect{
     rect = {"x1" : 0, "x2" : 0, "y1" : 0, "y2" : 0}
     refElm = {"x1" : 0, "x2" : 0, "y1" : 0, "y2" : 0}
     rectDomObj = Object
+    refDomObj = Object
     mouseupFcn = null
+    pointermode = "mouse"
+    scrollEn = false
 
     constructor(elmId) {
-        this.rectDomObj = $('<div />').appendTo('body');
+        this.refDomObj = $("#" + elmId)
+        this.calcRefElmSize(elmId)
+        $("#pointermode").change(this, this.changePointermode);
+        this.init();
+    }
+    init(){
+        this.rectDomObj = $('<div />').appendTo('#canvasContainer');
         this.rectDomObj.attr('id', 'rectSelect');
         this.rectDomObj.css("border", "1px solid red");
         this.rectDomObj.css("position", "absolute");
         this.rectDomObj.hide();
 
+        this.rect = {"x1" : 0, "x2" : 0, "y1" : 0, "y2" : 0};
+
+        //check wether it is a touch device or mouse system
+        if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0){
+            var that = this;
+            document.addEventListener('touchmove',function(e) {that.mousemove(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
+            document.addEventListener('touchend',function(e) {that.mouseup(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
+            document.addEventListener('touchstart',function(e) {that.mousedown(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
+            $("#scrollEn").click(function(e){that.scrollEnHandle(e, that)});
+            this.scrollEn = true;
+            $("#touchEn").css("background-color" , "green");
+        } else {
+            var that = this;
+            $("#canvasContainer").mousedown(function(e){that.mousedown(e.clientX, e.clientY, 0, 0, that);});
+            $("#canvasContainer").mouseup(function(e){that.mouseup(e.clientX, e.clientY, 0, 0, that);});
+            $("#canvasContainer").mousemove(function(e){that.mousemove(e.clientX, e.clientY, 0, 0, that);});
+            //$("#scrollEn").click(function(e){that.scrollEnHandle(e, that);});
+
+        }
+
         
+    }
 
-        $(document).mousedown(this, this.mousedown);
-        $(document).mouseup(this, this.mouseup);
-        $(document).mousemove(this, this.mousemove);
-
-        this.calcRefElmSize(elmId)
-
-
+    //manage scrolling on touch devices
+    scrollEnHandle(e, that){
+        if(that.scrollEn) {
+            $("#scrollEn").css("background-color","red");
+            $("html").css("touch-action", "none");
+            that.scrollEn = false;
+        } else if(!that.scrollEn) {
+            $("#scrollEn").css("background-color","green");
+            $("html").css("touch-action", "inherit")
+            that.scrollEn = true;
+        }
     }
 
     //attach a function to be called on mouseup
@@ -189,11 +225,15 @@ class rectSelect{
         this.rectDomObj.css("height",  y4 - y3 + 'px');
     }
 
-    mousedown(e) {
-        var that = e.data;
+    mousedown(x, y, offsetX, offsetY, that) {
 
-        that.rect.x1 = e.clientX + $(document).scrollLeft();
-        that.rect.y1 = e.clientY + $(document).scrollTop();
+        if (this.scrollEn)return;
+
+        if (! that.checkRefElmPos(x, y))
+            return
+
+        that.rect.x1 = x + $(document).scrollLeft() - offsetX;
+        that.rect.y1 = y + $(document).scrollTop() - offsetY;
 
         that.calcDiv();
         that.rectDomObj.show();
@@ -201,8 +241,8 @@ class rectSelect{
 
     }
 
-    mouseup(e) {
-        var that = e.data;
+    mouseup(x, y, offsetX, offsetY, that) {
+        if (this.scrollEn)return;
 
         if(that.mouseupFcn !== null) {
             //correct if square is not done left to right
@@ -231,14 +271,16 @@ class rectSelect{
         that.rectDomObj.hide();
     }
 
-    mousemove(e) {
-        var that = e.data;
+    mousemove(x, y, offsetX, offsetY, that) {
+        if (this.scrollEn)return;
 
-        if (! that.checkRefElmPos(e.clientX, e.clientY))
+        if (! that.checkRefElmPos(x, y))
             return
 
-        that.rect.x2 = e.clientX + $(document).scrollLeft();
-        that.rect.y2 = e.clientY + $(document).scrollTop();
+        $("#currentPos").html("x: " + x + "y: " + y + " offX: " + offsetX + " offY: " + offsetY);
+
+        that.rect.x2 = x + $(document).scrollLeft() - offsetX;
+        that.rect.y2 = y + $(document).scrollTop() - offsetY;
         that.calcDiv();
 
     }
