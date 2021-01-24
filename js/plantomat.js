@@ -31,6 +31,7 @@ class plantomat {
 
         //init canvas for edge outputs
         this.edgeCanvas = document.getElementById(edgeCanvas);
+        $(this.edgeCanvas).css({ "top" : offset.top + 'px', "left" : offset.left + 'px'})
         this.edgeCanvas.width = 0;
         this.edgeCanvas.height = 0;
         
@@ -51,7 +52,10 @@ class plantomat {
 
         
         this.origCanvas.width = this.img.naturalWidth;
-        this.origCanvas.height = this.img.naturalHeight;    
+        this.origCanvas.height = this.img.naturalHeight;  
+        
+        this.edgeCanvas.width = this.img.naturalWidth;
+        this.edgeCanvas.height = this.img.naturalHeight;
 
 
         //draw original to canvas
@@ -62,7 +66,15 @@ class plantomat {
 
     }
 
-    
+    getEdgePxCount() {
+        var imageData = this.edgeCtx.getImageData(0, 0, this.edgeCanvas.width, this.edgeCanvas.height);
+        var edgePx = 0
+        for (var pixel of imageData.data) {
+            if (pixel != 0)
+                edgePx ++;
+        }
+        console.log("Total edge pixel: " + edgePx);
+    }
 
     convertCanny(startX, startY, width, height) {
         startX = Math.round(startX);
@@ -102,48 +114,7 @@ class plantomat {
         }
         console.log("Black:" + black);
 
-
-        //add white part to canvas and rearrange
-        var newOffset = {"top" : 0, "left" : 0}
-        var oldImgOffset = {"top" : 0, "left" : 0}
-        
-        var absTop = startY + this.absTopLeft.y;
-        var absLeft = startX + this.absTopLeft.x;
-        if (this.edgeCanvas.width == 0 && this.edgeCanvas.height == 0) {
-            this.edgeCanvas.width = width
-            this.edgeCanvas.height = height
-            $(this.edgeCanvas).css({ "top" : absTop + 'px', "left" : absLeft + 'px'})
-        } else {
-            var oldImage = this.edgeCtx.getImageData(0, 0, this.edgeCanvas.width, this.edgeCanvas.height);
-
-            var currentPos = $(this.edgeCanvas).offset();
-            if (absTop < currentPos.top) {
-                this.edgeCanvas.height = currentPos.top - absTop + this.edgeCanvas.height;
-                $(this.edgeCanvas).css("top",  absTop + 'px');
-                oldImgOffset.top = currentPos.top - absTop
-            } else if (absTop > currentPos.top) {
-
-                newOffset.top = absTop - currentPos.top
-                this.edgeCanvas.height = absTop - currentPos.top + height;
-
-            }
-            if (absLeft < currentPos.left) {
-                this.edgeCanvas.width = currentPos.left - absLeft + this.edgeCanvas.width;
-                $(this.edgeCanvas).css("left",  absLeft + 'px');
-                oldImgOffset.left = currentPos.left - absLeft
-            } else if (absLeft > currentPos.left) {
-                newOffset.left = absLeft - currentPos.left
-                this.edgeCanvas.width = currentPos.left - absLeft + width;
-
-            }
-            this.edgeCtx.clearRect(0, 0, this.edgeCanvas.width, this.edgeCanvas.height);
-            this.edgeCtx.putImageData(oldImage, oldImgOffset.left, oldImgOffset.top);
-
-
-        }
-        this.edgeCtx.putImageData(imageData, newOffset.left, newOffset.top );
-
-        //this.origCtx.putImageData(imageData, startX, startY);
+        this.edgeCtx.putImageData(imageData, startX, startY);
         
 
 
