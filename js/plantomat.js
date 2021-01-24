@@ -6,11 +6,14 @@
 
 
 class plantomat {
-    ctxObj = Object
-    ctx = Object
+    origCanvas = Object
+    edgeCanvas = Object
+    origCtx = Object
+    edgeCtx = Object
     imgUrl = ""
     selector = Object
     img = Object
+    absTopLeft = {"x" : 0, "y" : 0}
 
     constructor(imgUrl){
         console.log("start plantomat");
@@ -20,12 +23,23 @@ class plantomat {
         this.img.src = this.imgUrl;
     } 
 
-    calc(ctxId) {
-        this.ctxObj = document.getElementById(ctxId);
-       
+    init(origCanvas, edgeCanvas) {
+        this.origCanvas = document.getElementById(origCanvas);
+        var offset = $(this.origCanvas).offset();
+        this.absTopLeft.x = offset.left;
+        this.absTopLeft.y = offset.top;
+
+        //init canvas for edge outputs
+        this.edgeCanvas = document.getElementById(edgeCanvas);
+        this.edgeCanvas.width = 0;
+        this.edgeCanvas.height = 0;
+        
+        this.edgeCtx = this.edgeCanvas.getContext('2d');
+        this.edgeCtx.fillStyle = "rgb(0,255,0)";
+        this.edgeCtx.strokeStyle = "rgb(0,255,0)";
         
         this.loadImage();
-        this.selector = new rectSelect(ctxId);
+        this.selector = new rectSelect(origCanvas);
         this.selector.attachMouseupFcn(this.newSelection, this);
     }
 
@@ -36,15 +50,15 @@ class plantomat {
     loadImage() {      
 
         
-        this.ctxObj.width = this.img.naturalWidth;
-        this.ctxObj.height = this.img.naturalHeight;    
+        this.origCanvas.width = this.img.naturalWidth;
+        this.origCanvas.height = this.img.naturalHeight;    
 
 
         //draw original to canvas
-        this.ctx = this.ctxObj.getContext('2d');
-        this.ctx.fillStyle = "rgb(0,255,0)";
-        this.ctx.strokeStyle = "rgb(0,255,0)";
-        this.ctx.drawImage(this.img, 0, 0, this.img.naturalWidth, this.img.naturalHeight, 0, 0, this.img.naturalWidth, this.img.naturalHeight);
+        this.origCtx = this.origCanvas.getContext('2d');
+        this.origCtx.fillStyle = "rgb(0,255,0)";
+        this.origCtx.strokeStyle = "rgb(0,255,0)";
+        this.origCtx.drawImage(this.img, 0, 0, this.img.naturalWidth, this.img.naturalHeight, 0, 0, this.img.naturalWidth, this.img.naturalHeight);
 
     }
 
@@ -60,7 +74,7 @@ class plantomat {
         var img_u8 = new jsfeat.matrix_t(width, height, jsfeat.U8C1_t);
        
     
-        var imageData = this.ctx.getImageData(startX, startY, width, height);
+        var imageData = this.origCtx.getImageData(startX, startY, width, height);
 
         jsfeat.imgproc.grayscale(imageData.data, width, height, img_u8);
 
@@ -87,7 +101,50 @@ class plantomat {
             
         }
         console.log("Black:" + black);
-        this.ctx.putImageData(imageData, startX, startY);
+
+
+        //add white part to canvas and rearrange
+        var newOffset = {"top" : 0, "left" : 0}
+        var oldImgOffset = {"top" : 0, "left" : 0}
+        
+        var absTop = startY + this.absTopLeft.y;
+        var absLeft = startX + this.absTopLeft.x;
+        if (this.edgeCanvas.width == 0 && this.edgeCanvas.height == 0) {
+            this.edgeCanvas.width = width
+            this.edgeCanvas.height = height
+            $(this.edgeCanvas).css({ "top" : absTop + 'px', "left" : absLeft + 'px'})
+        } else {
+            var oldImage = this.edgeCtx.getImageData(0, 0, this.edgeCanvas.width, this.edgeCanvas.height);
+
+            var currentPos = $(this.edgeCanvas).offset();
+            if (absTop < currentPos.top) {
+                this.edgeCanvas.height = currentPos.top - absTop + this.edgeCanvas.height;
+                $(this.edgeCanvas).css("top",  absTop + 'px');
+                oldImgOffset.top = currentPos.top - absTop
+            } else if (absTop > currentPos.top) {
+
+                newOffset.top = absTop - currentPos.top
+                this.edgeCanvas.height = absTop - currentPos.top + height;
+
+            }
+            if (absLeft < currentPos.left) {
+                this.edgeCanvas.width = currentPos.left - absLeft + this.edgeCanvas.width;
+                $(this.edgeCanvas).css("left",  absLeft + 'px');
+                oldImgOffset.left = currentPos.left - absLeft
+            } else if (absLeft > currentPos.left) {
+                newOffset.left = absLeft - currentPos.left
+                this.edgeCanvas.width = currentPos.left - absLeft + width;
+
+            }
+            this.edgeCtx.clearRect(0, 0, this.edgeCanvas.width, this.edgeCanvas.height);
+            this.edgeCtx.putImageData(oldImage, oldImgOffset.left, oldImgOffset.top);
+
+
+        }
+        this.edgeCtx.putImageData(imageData, newOffset.left, newOffset.top );
+
+        //this.origCtx.putImageData(imageData, startX, startY);
+        
 
 
     }
@@ -102,8 +159,8 @@ class analyzer{
 
 class rectSelect{
     
-    rect = {x1 : 0, x2 : 0, y1 : 0, y2 : 0}
-    refElm = {x1 : 0, x2 : 0, y1 : 0, y2 : 0}
+    rect = {"x1" : 0, "x2" : 0, "y1" : 0, "y2" : 0}
+    refElm = {"x1" : 0, "x2" : 0, "y1" : 0, "y2" : 0}
     rectDomObj = Object
     mouseupFcn = null
 
@@ -199,7 +256,7 @@ class rectSelect{
             that.mouseupFcn.ptr(that.rect, that.mouseupFcn.scope);
         }
 
-        that.rect = {x1 : 0, x2 : 0, y1 : 0, y2 : 0};
+        that.rect = {"x1" : 0, "x2" : 0, "y1" : 0, "y2" : 0};
         that.rectDomObj.hide();
     }
 
