@@ -9,7 +9,7 @@
         var test = Object;
 
         $( document ).ready(function() {
-            plantomatObj = new plantomat("./FG444-3HQ.jpg");
+            plantomatObj = new plantomat();
         })
     </script>
 </head>
@@ -32,6 +32,9 @@
         <div style="float: left; border: solid black 1px">
         Last square:&nbsp;<div id="lastEdgePixel"></div>
         All:&nbsp;<div id="allEdgePixel"></div>
+        </div>
+        <div style="float: left; border: solid black 1px">
+            <input type="file" id="imageFile" accept="image/jpg">
         </div>
         <div style="clear: left;"></div>
     </div>

@@ -14,38 +14,85 @@ class plantomat {
     selector = Object
     img = Object
     absTopLeft = {"x" : 0, "y" : 0}
+    eraser = false
 
     constructor(imgUrl){
         console.log("start plantomat");
-        this.imgUrl = imgUrl;
+
+
+
+    } 
+
+    clickEraseEn(e, that){
+        if (that.eraser) {
+            that.eraser = false;
+            that.selector.setMode("square");
+            $("#eraseEn").css("background-color" , "red");
+            //check wether it is a touch device or mouse system
+            if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0)
+                $(this.edgeCanvas).off('touchmove');
+            else
+                $(this.edgeCanvas).off('mousemove');
+        } else {
+            that.eraser = true;
+            that.selector.setMode("erase");
+            $("#eraseEn").css("background-color" , "green");
+            var that = this;
+            if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0)
+                $(this.edgeCanvas).mousemove(function(e, that){ that.erase(e, that)});
+            else
+                $(this.edgeCanvas).mousemove(function(e, that){ that.erase(e, that)});
+
+        }
+        
+    
+    }
+
+    imageRead(origCanvas,edgeCanvas,that){
+        that.origCanvas = document.getElementById(origCanvas);
+        var offset = $(that.origCanvas).offset();
+        that.absTopLeft.x = offset.left;
+        that.absTopLeft.y = offset.top;
+
+        //init canvas for edge outputs
+        that.edgeCanvas = document.getElementById(edgeCanvas);
+        $(that.edgeCanvas).css({ "top" : offset.top + 'px', "left" : offset.left + 'px'})
+        that.edgeCanvas.width = 0;
+        that.edgeCanvas.height = 0;
+        
+        that.edgeCtx = that.edgeCanvas.getContext('2d');
+        that.edgeCtx.fillStyle = "rgb(0,255,0)";
+        that.edgeCtx.strokeStyle = "rgb(0,255,0)";
+        
+        that.loadImage();
+        that.selector = new rectSelect(origCanvas);
+        that.selector.attachMouseupFcn(that.newSelection, that);
+
+        //var that = this;
+        $("#eraseEn").click(function(e){ that.clickEraseEn(e, that) })
+
+    }
+
+    init(origCanvas, edgeCanvas) {
+        
+        this.imgUrl = URL.createObjectURL(document.getElementById("imageFile").files[0]);
         this.img = new Image()
         
         this.img.src = this.imgUrl;
-    } 
+        var that = this
+        this.img.onload = function(e) {that.imageRead(origCanvas,edgeCanvas,that)};
 
-    init(origCanvas, edgeCanvas) {
-        this.origCanvas = document.getElementById(origCanvas);
-        var offset = $(this.origCanvas).offset();
-        this.absTopLeft.x = offset.left;
-        this.absTopLeft.y = offset.top;
 
-        //init canvas for edge outputs
-        this.edgeCanvas = document.getElementById(edgeCanvas);
-        $(this.edgeCanvas).css({ "top" : offset.top + 'px', "left" : offset.left + 'px'})
-        this.edgeCanvas.width = 0;
-        this.edgeCanvas.height = 0;
-        
-        this.edgeCtx = this.edgeCanvas.getContext('2d');
-        this.edgeCtx.fillStyle = "rgb(0,255,0)";
-        this.edgeCtx.strokeStyle = "rgb(0,255,0)";
-        
-        this.loadImage();
-        this.selector = new rectSelect(origCanvas);
-        this.selector.attachMouseupFcn(this.newSelection, this);
+
+
     }
 
     newSelection(selection, scope) {
         scope.convertCanny(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1);
+    }
+
+    erase(e, that) {
+
     }
 
     loadImage() {      
@@ -137,15 +184,19 @@ class rectSelect{
     rectDomObj = Object
     refDomObj = Object
     mouseupFcn = null
-    pointermode = "mouse"
     scrollEn = false
+    mode = "square"
 
     constructor(elmId) {
         this.refDomObj = $("#" + elmId)
         this.calcRefElmSize(elmId)
-        $("#pointermode").change(this, this.changePointermode);
         this.init();
     }
+
+    setMode(mode) {
+        this.mode = mode;
+    }
+
     init(){
         this.rectDomObj = $('<div />').appendTo('#canvasContainer');
         this.rectDomObj.attr('id', 'rectSelect');
@@ -228,6 +279,7 @@ class rectSelect{
     mousedown(x, y, offsetX, offsetY, that) {
 
         if (this.scrollEn)return;
+        if (this.mode != "square")return;
 
         if (! that.checkRefElmPos(x, y))
             return
@@ -243,6 +295,7 @@ class rectSelect{
 
     mouseup(x, y, offsetX, offsetY, that) {
         if (this.scrollEn)return;
+        if (this.mode != "square")return;
 
         if(that.mouseupFcn !== null) {
             //correct if square is not done left to right
@@ -273,6 +326,7 @@ class rectSelect{
 
     mousemove(x, y, offsetX, offsetY, that) {
         if (this.scrollEn)return;
+        if (this.mode != "square")return;
 
         if (! that.checkRefElmPos(x, y))
             return
