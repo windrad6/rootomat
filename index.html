@@ -2,8 +2,10 @@
 <html>
 <head>
     <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="css/radio_class.css" type="text/css" media="screen" />
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="module" src="./submodules/jsfeat/build/jsfeat.js"></script>
+    <script type="text/javascript" src="./js/radioClass.js"></script>
     <script type="text/javascript" src="./js/rectSelect.js"></script>
     <script type="text/javascript" src="./js/rootomat.js"></script>
     <script type="text/javascript">
@@ -12,31 +14,34 @@
 
         $( document ).ready(function() {
             rootomatObj = new rootomat();
+            rootomatObj.createToolSelect("tool_select");
         })
     </script>
 </head>
 <body>
     <div id ="placeholder">&nbsp;</div>
     <div id = "controls">
-        <div style="float: left;">
+        <div  class="controlElements">
             <button onclick="rootomatObj.init('image','edges')">Load image</button><br />
             <button onclick="rootomatObj.getEdgePxCount()">Calc pixel</button><br />
 
         </div>
-        <div style="float: left;">
-        Touch enable<div id="touchEn" style="background-color: red; width: 50px;">&nbsp;</div>
-        Scroll enable<div id="scrollEn" style="background-color: green; width: 50px;">&nbsp;</div>
+        <div  class="controlElements">
+            Status: <br />
+            <img id="touchEn" src="./images/gesture-tap-button.svg" /><br />
         </div>
-        <div style="float: left;">
+        <div  class="controlElements">
             Current pos<div id="currentPos"></div>
-            Eraser enable<div id="eraseEn" style="background-color: red; width: 50px;">&nbsp;</div>
         </div>
-        <div style="float: left; border: solid black 1px">
+        <div  class="controlElements" style="border: solid black 1px">
         Last square:&nbsp;<div id="lastEdgePixel"></div>
         All:&nbsp;<div id="allEdgePixel"></div>
         </div>
-        <div style="float: left; border: solid black 1px">
+        <div  class="controlElements" style="border: solid black 1px">
             <input type="file" id="imageFile" accept="image/jpg">
+        </div>
+        <div class="controlElements" id="tool_select">
+            Tools: <br />
         </div>
         <div style="clear: left;"></div>
     </div>

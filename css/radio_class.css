@@ -1,0 +1,34 @@
+
+
+.radio_select img {
+    width : 30px;
+    padding: 2px;
+    margin : 2px;
+}
+
+.radio_select input{
+    display: none;
+}
+
+.radio_select .selected {
+    background-color: #ccc;
+}
+
+
+.radio_select label {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.radio_select label:hover {
+    background-color: #efefef;
+
+}
+
+.maximize {
+
+}
+
+.pan {
+  
+}

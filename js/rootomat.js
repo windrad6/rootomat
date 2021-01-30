@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Manuel Pitz, RWTH Aachen University
+// Copyright (c) 2020 Manuel Pitz
 //
 // Licensed under the MIT license <LICENSE-MIT or
 // http://opensource.org/licenses/MIT>. This file may not be
@@ -14,38 +14,47 @@ class rootomat {
     selector = Object
     img = Object
     absTopLeft = {"x" : 0, "y" : 0}
-    eraser = false
+    toolSelect = Object
+    modeSelect = ""
 
     constructor(imgUrl){
         console.log("start rootomat");
 
 
-
+        //check wether it is a touch device or mouse system
+        if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0)
+            $("#touchEn").css("background-color" , "green");
     } 
 
-    clickEraseEn(e, that){
-        if (that.eraser) {
-            that.eraser = false;
-            that.selector.setMode("square");
-            $("#eraseEn").css("background-color" , "red");
-            //check wether it is a touch device or mouse system
-            if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0)
-                $(this.edgeCanvas).off('touchmove');
-            else
-                $(this.edgeCanvas).off('mousemove');
-        } else {
-            that.eraser = true;
-            that.selector.setMode("erase");
-            $("#eraseEn").css("background-color" , "green");
-            var that = this;
-            if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0)
-                $(this.edgeCanvas).mousemove(function(e, that){ that.erase(e, that)});
-            else
-                $(this.edgeCanvas).mousemove(function(e, that){ that.erase(e, that)});
 
+    modeSwitch(mode, that) {
+
+        if (that.modeSelect == "download") {
+
+        } else if (that.modeSelect == "rectSelect") {
+            that.selector.enableRectSelect(false)
+        } else if (that.modeSelect == "pan") {
+            $("html").css("touch-action", "none")
+        }
+
+        if (mode == "download") {
+
+        } else if (mode == "rectSelect") {
+            that.selector.enableRectSelect(true)
+        } else if (mode == "pan") {
+            $("html").css("touch-action", "inherit");
         }
         
-    
+        that.modeSelect = mode;
+    }
+
+    createToolSelect(domId){
+        this.toolSelect = new radioClass(domId);
+        this.toolSelect.addElm("toolSelect","Select","rectSelect","rectSelect","./images/select-drag.svg")
+        this.toolSelect.addElm("toolSelect","Pan","pan","pan","./images/pan.svg")
+        this.toolSelect.addElm("toolSelect","Download","download","download","./images/cloud-download-outline.svg")
+        this.toolSelect.addElm("toolSelect","Erase","erase","erase","./images/eraser.svg")
+        this.toolSelect.attachHandler(this.modeSwitch, this)
     }
 
     imageRead(origCanvas,edgeCanvas,that){
@@ -89,10 +98,6 @@ class rootomat {
 
     newSelection(selection, scope) {
         scope.convertCanny(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1);
-    }
-
-    erase(e, that) {
-
     }
 
     loadImage() {      
@@ -161,7 +166,6 @@ class rootomat {
             
         }
         $("#lastEdgePixel").html(black);
-        console.log("Black:" + black);
 
         this.edgeCtx.putImageData(imageData, startX, startY);
         

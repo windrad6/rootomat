@@ -1,3 +1,9 @@
+// Copyright (c) 2020 Manuel Pitz
+//
+// Licensed under the MIT license <LICENSE-MIT or
+// http://opensource.org/licenses/MIT>. This file may not be
+// copied, modified, or distributed except according to those terms.
+
 class rectSelect{
     
     rect = {"x1" : 0, "x2" : 0, "y1" : 0, "y2" : 0}
@@ -5,8 +11,7 @@ class rectSelect{
     rectDomObj = Object
     refDomObj = Object
     mouseupFcn = null
-    scrollEn = false
-    mode = "square"
+    selfEn = true
 
     constructor(elmId) {
         this.refDomObj = $("#" + elmId)
@@ -14,8 +19,8 @@ class rectSelect{
         this.init();
     }
 
-    setMode(mode) {
-        this.mode = mode;
+    enableRectSelect(enableIn) {
+        this.selfEn = enableIn;
     }
 
     init(){
@@ -33,32 +38,16 @@ class rectSelect{
             document.addEventListener('touchmove',function(e) {that.mousemove(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
             document.addEventListener('touchend',function(e) {that.mouseup(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
             document.addEventListener('touchstart',function(e) {that.mousedown(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
-            $("#scrollEn").click(function(e){that.scrollEnHandle(e, that)});
-            this.scrollEn = true;
             $("#touchEn").css("background-color" , "green");
         } else {
             var that = this;
             $("#canvasContainer").mousedown(function(e){that.mousedown(e.clientX, e.clientY, 0, 0, that);});
             $("#canvasContainer").mouseup(function(e){that.mouseup(e.clientX, e.clientY, 0, 0, that);});
             $("#canvasContainer").mousemove(function(e){that.mousemove(e.clientX, e.clientY, 0, 0, that);});
-            //$("#scrollEn").click(function(e){that.scrollEnHandle(e, that);});
 
         }
 
         
-    }
-
-    //manage scrolling on touch devices
-    scrollEnHandle(e, that){
-        if(that.scrollEn) {
-            $("#scrollEn").css("background-color","red");
-            $("html").css("touch-action", "none");
-            that.scrollEn = false;
-        } else if(!that.scrollEn) {
-            $("#scrollEn").css("background-color","green");
-            $("html").css("touch-action", "inherit")
-            that.scrollEn = true;
-        }
     }
 
     //attach a function to be called on mouseup
@@ -99,8 +88,7 @@ class rectSelect{
 
     mousedown(x, y, offsetX, offsetY, that) {
 
-        if (this.scrollEn)return;
-        if (this.mode != "square")return;
+        if (!this.selfEn)return;
 
         if (! that.checkRefElmPos(x, y))
             return
@@ -115,8 +103,7 @@ class rectSelect{
     }
 
     mouseup(x, y, offsetX, offsetY, that) {
-        if (this.scrollEn)return;
-        if (this.mode != "square")return;
+        if (!this.selfEn)return;
 
         if(that.mouseupFcn !== null) {
             //correct if square is not done left to right
@@ -146,8 +133,7 @@ class rectSelect{
     }
 
     mousemove(x, y, offsetX, offsetY, that) {
-        if (this.scrollEn)return;
-        if (this.mode != "square")return;
+        if (!this.selfEn)return;
 
         if (! that.checkRefElmPos(x, y))
             return

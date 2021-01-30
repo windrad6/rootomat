@@ -1,4 +1,6 @@
-
+.controlElements {
+    float:left
+}
 
 #placeholder {
     height: 100px; 
@@ -12,4 +14,11 @@
     background-color: white;
     z-index:10;
     width: 100%;
+}
+
+#touchEn{
+    padding : 2px;
+    margin : 2px;
+    width:30px;
+    background-color: red;
 }
