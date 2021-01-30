@@ -3,13 +3,13 @@
 <head>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="module" src="./submodules/jsfeat/build/jsfeat.js"></script>
-    <script type="text/javascript" src="./js/plantomat.js"></script>
+    <script type="text/javascript" src="./js/rootomat.js"></script>
     <script type="text/javascript">
-        var plantomatObj = Object;
+        var rootomatObj = Object;
         var test = Object;
 
         $( document ).ready(function() {
-            plantomatObj = new plantomat();
+            rootomatObj = new rootomat();
         })
     </script>
 </head>
@@ -17,8 +17,8 @@
     <div id ="placeholder" style="height: 100px;">&nbsp;</div>
     <div id = "controls" style="height: 100px; position: fixed; top: 0; left: 0;background-color: white; z-index:10; width: 100%;">
         <div style="float: left;">
-            <button onclick="plantomatObj.init('image','edges')">Load image</button><br />
-            <button onclick="plantomatObj.getEdgePxCount()">Calc pixel</button><br />
+            <button onclick="rootomatObj.init('image','edges')">Load image</button><br />
+            <button onclick="rootomatObj.getEdgePxCount()">Calc pixel</button><br />
 
         </div>
         <div style="float: left;">

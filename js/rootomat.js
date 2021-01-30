@@ -5,7 +5,7 @@
 // copied, modified, or distributed except according to those terms.
 
 
-class plantomat {
+class rootomat {
     origCanvas = Object
     edgeCanvas = Object
     origCtx = Object
@@ -17,7 +17,7 @@ class plantomat {
     eraser = false
 
     constructor(imgUrl){
-        console.log("start plantomat");
+        console.log("start rootomat");
 
 
 
