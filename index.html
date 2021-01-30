@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="module" src="./submodules/jsfeat/build/jsfeat.js"></script>
+    <script type="text/javascript" src="./js/rectSelect.js"></script>
     <script type="text/javascript" src="./js/rootomat.js"></script>
     <script type="text/javascript">
         var rootomatObj = Object;
@@ -14,8 +16,8 @@
     </script>
 </head>
 <body>
-    <div id ="placeholder" style="height: 100px;">&nbsp;</div>
-    <div id = "controls" style="height: 100px; position: fixed; top: 0; left: 0;background-color: white; z-index:10; width: 100%;">
+    <div id ="placeholder">&nbsp;</div>
+    <div id = "controls">
         <div style="float: left;">
             <button onclick="rootomatObj.init('image','edges')">Load image</button><br />
             <button onclick="rootomatObj.getEdgePxCount()">Calc pixel</button><br />
