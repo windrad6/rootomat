@@ -14,6 +14,7 @@ class rootomat {
     selector = Object
     eraser = Object
     pencil = Object
+    download = Object
     img = Object
     colorPicker = Object
     absTopLeft = {"x" : 0, "y" : 0}
@@ -39,6 +40,9 @@ class rootomat {
         this.selector = new rectSelect("rectSelectElm","edges");
         this.selector.attachMouseupFcn(this.newSelection, this);
 
+        this.download = new rectSelect("rectDownloadElm","edges");
+        this.download.attachMouseupFcn(this.downloadImg, this);
+
 
     } 
 
@@ -46,7 +50,7 @@ class rootomat {
     modeSwitch(mode, that) {
 
         if (that.modeSelect == "download") {
-
+            that.download.enableSelf(false)
         } else if (that.modeSelect == "rectSelect") {
             that.selector.enableSelf(false)
         } else if (that.modeSelect == "pan") {
@@ -58,7 +62,7 @@ class rootomat {
         }
 
         if (mode == "download") {
-
+            that.download.enableSelf(true)
         } else if (mode == "rectSelect") {
             that.selector.enableSelf(true)
         } else if (mode == "pan") {
@@ -111,11 +115,17 @@ class rootomat {
         that.selector.calcRefElmSize();
         that.eraser.calcRefElmSize();
         that.pencil.calcRefElmSize();
+        that.download.calcRefElmSize();
 
     }
 
     init(origCanvas, edgeCanvas) {
         
+        if(document.getElementById("imageFile").files.length < 1){
+            alert("Please select an image first");
+            return;
+        }
+    
         this.imgUrl = URL.createObjectURL(document.getElementById("imageFile").files[0]);
         this.img = new Image()
         
@@ -127,6 +137,43 @@ class rootomat {
 
 
     }
+    downloadImg(selection, scope) {
+
+        var tmpCanvas = $("<canvas/>").attr({
+            "width" : selection.x2 - selection.x1,
+            "height" : selection.y2 - selection.y1
+        })
+        tmpCanvas = tmpCanvas[0]
+        var tmpCtx = tmpCanvas.getContext('2d')
+
+        var tmpOrig = scope.origCtx.getImageData(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1)
+        var tmpEdge = scope.edgeCtx.getImageData(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1)
+
+
+        for(var i = 0; i < tmpOrig.data.length; i+=4) {
+            if( tmpEdge.data[i + 3] != 0) {//it is not an alpha pixel
+                tmpOrig.data[i] = tmpEdge.data[i];
+                tmpOrig.data[i + 1] = tmpEdge.data[i + 1];
+                tmpOrig.data[i + 2] = tmpEdge.data[i + 2];
+                tmpOrig.data[i + 3] = tmpEdge.data[i + 3];
+            }
+        }
+        tmpCtx.putImageData(tmpOrig, 0, 0);
+        
+
+        var dateObj = new Date();
+
+        var tmpLink = document.createElement('a');
+        tmpLink.download = 'plantomat'
+                            + dateObj.getFullYear() + "_" 
+                            + (dateObj.getMonth() + 1) + "_" 
+                            + dateObj.getDate() + "_" 
+                            + dateObj.getHours() + "_" 
+                            + dateObj.getMinutes() + "_" 
+                            + dateObj.getSeconds() + '.png';
+        tmpLink.href = tmpCanvas.toDataURL("image/png");
+        tmpLink.click();
+    }
 
     newSelection(selection, scope) {
         scope.convertCanny(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1);
@@ -137,7 +184,6 @@ class rootomat {
     }
 
     loadImage() {      
-
         
         this.origCanvas.width = this.img.naturalWidth;
         this.origCanvas.height = this.img.naturalHeight;  
