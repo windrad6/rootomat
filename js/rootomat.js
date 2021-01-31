@@ -12,18 +12,32 @@ class rootomat {
     edgeCtx = Object
     imgUrl = ""
     selector = Object
+    eraser = Object
+    pencil = Object
     img = Object
     absTopLeft = {"x" : 0, "y" : 0}
     toolSelect = Object
     modeSelect = ""
 
     constructor(imgUrl){
-        console.log("start rootomat");
-
 
         //check wether it is a touch device or mouse system
         if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0)
             $("#touchEn").css("background-color" , "green");
+
+        this.eraser = new rectSelect("rectEraseElm","edges");
+        this.eraser.setSize(20);
+        this.eraser.attachMouseupFcn(this.removePixel, this);
+
+        this.pencil = new rectSelect("rectPencilElm","edges");
+        this.pencil.setSize(20);
+        this.pencil.attachMouseupFcn(this.newSelection, this);
+
+
+        this.selector = new rectSelect("rectSelectElm","edges");
+        this.selector.attachMouseupFcn(this.newSelection, this);
+
+
     } 
 
 
@@ -32,17 +46,25 @@ class rootomat {
         if (that.modeSelect == "download") {
 
         } else if (that.modeSelect == "rectSelect") {
-            that.selector.enableRectSelect(false)
+            that.selector.enableSelf(false)
         } else if (that.modeSelect == "pan") {
             $("html").css("touch-action", "none")
+        } else if (that.modeSelect == "pencilSelect") {
+            that.pencil.enableSelf(false)
+        } else if (that.modeSelect == "erase") {
+            that.eraser.enableSelf(false)
         }
 
         if (mode == "download") {
 
         } else if (mode == "rectSelect") {
-            that.selector.enableRectSelect(true)
+            that.selector.enableSelf(true)
         } else if (mode == "pan") {
             $("html").css("touch-action", "inherit");
+        } else if (mode == "pencilSelect") {
+            that.pencil.enableSelf(true)
+        } else if (mode == "erase") {
+            that.eraser.enableSelf(true)
         }
         
         that.modeSelect = mode;
@@ -51,11 +73,14 @@ class rootomat {
     createToolSelect(domId){
         this.toolSelect = new radioClass(domId);
         this.toolSelect.addElm("toolSelect","Select","rectSelect","rectSelect","./images/select-drag.svg")
+        this.toolSelect.addElm("toolSelect","Pencil","pencilSelect","pencilSelect","./images/lead-pencil.svg")
         this.toolSelect.addElm("toolSelect","Pan","pan","pan","./images/pan.svg")
         this.toolSelect.addElm("toolSelect","Download","download","download","./images/cloud-download-outline.svg")
         this.toolSelect.addElm("toolSelect","Erase","erase","erase","./images/eraser.svg")
         this.toolSelect.attachHandler(this.modeSwitch, this)
     }
+
+
 
     imageRead(origCanvas,edgeCanvas,that){
         that.origCanvas = document.getElementById(origCanvas);
@@ -74,11 +99,9 @@ class rootomat {
         that.edgeCtx.strokeStyle = "rgb(0,255,0)";
         
         that.loadImage();
-        that.selector = new rectSelect(origCanvas);
-        that.selector.attachMouseupFcn(that.newSelection, that);
-
-        //var that = this;
-        $("#eraseEn").click(function(e){ that.clickEraseEn(e, that) })
+        that.selector.calcRefElmSize();
+        that.eraser.calcRefElmSize();
+        that.pencil.calcRefElmSize();
 
     }
 
@@ -98,6 +121,10 @@ class rootomat {
 
     newSelection(selection, scope) {
         scope.convertCanny(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1);
+    }
+
+    removePixel(selection, scope) {
+        scope.edgeCtx.clearRect(selection.x1, selection.y1, selection.x2-selection.x1, selection.y2-selection.y1);
     }
 
     loadImage() {      

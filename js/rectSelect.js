@@ -11,21 +11,22 @@ class rectSelect{
     rectDomObj = Object
     refDomObj = Object
     mouseupFcn = null
-    selfEn = true
+    selfEn = false
+    size = -1
 
-    constructor(elmId) {
-        this.refDomObj = $("#" + elmId)
-        this.calcRefElmSize(elmId)
-        this.init();
+    constructor(elmId, refElm) {
+        this.refDomObj = $("#" + refElm)
+        this.calcRefElmSize()
+        this.init(elmId,);
     }
 
-    enableRectSelect(enableIn) {
+    enableSelf(enableIn) {
         this.selfEn = enableIn;
     }
 
-    init(){
-        this.rectDomObj = $('<div />').appendTo('#canvasContainer');
-        this.rectDomObj.attr('id', 'rectSelect');
+    init(elmId){
+        this.rectDomObj = $('<div />').appendTo($(this.refDomObj).parent());
+        this.rectDomObj.attr('id', elmId);
         this.rectDomObj.css("border", "1px solid red");
         this.rectDomObj.css("position", "absolute");
         this.rectDomObj.hide();
@@ -38,17 +39,19 @@ class rectSelect{
             document.addEventListener('touchmove',function(e) {that.mousemove(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
             document.addEventListener('touchend',function(e) {that.mouseup(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
             document.addEventListener('touchstart',function(e) {that.mousedown(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
-            $("#touchEn").css("background-color" , "green");
         } else {
             var that = this;
             $("#canvasContainer").mousedown(function(e){that.mousedown(e.clientX, e.clientY, 0, 0, that);});
             $("#canvasContainer").mouseup(function(e){that.mouseup(e.clientX, e.clientY, 0, 0, that);});
             $("#canvasContainer").mousemove(function(e){that.mousemove(e.clientX, e.clientY, 0, 0, that);});
-
         }
 
         
     }
+    setSize(sizeIn) {
+        this.size = sizeIn;
+    }
+
 
     //attach a function to be called on mouseup
     attachMouseupFcn(fcnPtr , scope){
@@ -56,14 +59,14 @@ class rectSelect{
     }
 
     //calculate the abs coordinates of the reference element (elmId)
-    calcRefElmSize(elmId) {
+    calcRefElmSize() {
 
-        var offset = $("#" + elmId).offset();
+        var offset = $(this.refDomObj).offset();
 
         this.refElm.x1 = offset.left
-        this.refElm.x2 = offset.left + $("#" + elmId).width();
+        this.refElm.x2 = offset.left + $(this.refDomObj).width();
         this.refElm.y1 = offset.top
-        this.refElm.y2 = offset.top + $("#" + elmId).height();
+        this.refElm.y2 = offset.top + $(this.refDomObj).height();
     }
 
     //check if mouse is outside the reference elm (elmId from constructor)
@@ -86,6 +89,18 @@ class rectSelect{
         this.rectDomObj.css("height",  y4 - y3 + 'px');
     }
 
+    calcCircle() {
+        var x3 = Math.min(this.rect.x1,this.rect.x2);
+        var x4 = Math.max(this.rect.x1,this.rect.x2);
+        var y3 = Math.min(this.rect.y1,this.rect.y2);
+        var y4 = Math.max(this.rect.y1,this.rect.y2);
+
+        this.rectDomObj.css("left", this.rect.x2 - this.size/2 + 'px');
+        this.rectDomObj.css("top", this.rect.y2 - this.size/2 + 'px');
+        this.rectDomObj.css("width", + this.size + 'px');
+        this.rectDomObj.css("height",  + this.size + 'px');
+    }
+
     mousedown(x, y, offsetX, offsetY, that) {
 
         if (!this.selfEn)return;
@@ -96,7 +111,11 @@ class rectSelect{
         that.rect.x1 = x + $(document).scrollLeft() - offsetX;
         that.rect.y1 = y + $(document).scrollTop() - offsetY;
 
-        that.calcDiv();
+
+        if(that.size != -1)
+            that.calcCircle()
+        else
+            that.calcDiv();
         that.rectDomObj.show();
 
 
@@ -120,12 +139,20 @@ class rectSelect{
             }
 
             //correct the 0 point of the rectangle to be relative to the elmId
-            that.rect.x1 = that.rect.x1 - that.refElm.x1
-            that.rect.x2 = that.rect.x2 - that.refElm.x1
-            that.rect.y1 = that.rect.y1 - that.refElm.y1
-            that.rect.y2 = that.rect.y2 - that.refElm.y1
+            var coordinates = {"x1" : 0,"x2" : 0,"y1" : 0,"y2" : 0}
+            if (that.size != -1) {
+                coordinates.x1 = that.rect.x2 - that.size/2  - that.refElm.x1
+                coordinates.y1 = that.rect.y2 - that.size/2 - that.refElm.y1
+                coordinates.x2 = that.rect.x2 + that.size/2 - that.refElm.x1
+                coordinates.y2 = that.rect.y2 + that.size/2 - that.refElm.y1
+            } else {
+                coordinates.x1 = that.rect.x1 - that.refElm.x1
+                coordinates.x2 = that.rect.x2 - that.refElm.x1
+                coordinates.y1 = that.rect.y1 - that.refElm.y1
+                coordinates.y2 = that.rect.y2 - that.refElm.y1
+            }
 
-            that.mouseupFcn.ptr(that.rect, that.mouseupFcn.scope);
+            that.mouseupFcn.ptr(coordinates, that.mouseupFcn.scope);
         }
 
         that.rect = {"x1" : 0, "x2" : 0, "y1" : 0, "y2" : 0};
@@ -135,14 +162,30 @@ class rectSelect{
     mousemove(x, y, offsetX, offsetY, that) {
         if (!this.selfEn)return;
 
-        if (! that.checkRefElmPos(x, y))
-            return
+        if (!that.checkRefElmPos(x, y))
+            return;
+
+        if(that.rect.y1 == 0 || that.rect.x1 == 0)
+            return;
 
         $("#currentPos").html("x: " + x + "y: " + y + " offX: " + offsetX + " offY: " + offsetY);
 
         that.rect.x2 = x + $(document).scrollLeft() - offsetX;
         that.rect.y2 = y + $(document).scrollTop() - offsetY;
-        that.calcDiv();
+        if(that.size != -1) {
+            var coordinates = {"x1" : 0,"x2" : 0,"y1" : 0,"y2" : 0}
+            
+            coordinates.x1 = that.rect.x2 - that.size/2  - that.refElm.x1
+            coordinates.y1 = that.rect.y2 - that.size/2 - that.refElm.y1
+            coordinates.x2 = that.rect.x2 + that.size/2 - that.refElm.x1
+            coordinates.y2 = that.rect.y2 + that.size/2 - that.refElm.y1
+            that.mouseupFcn.ptr(coordinates, that.mouseupFcn.scope);
+            that.calcCircle()
+        } else {
+            that.calcDiv();
+
+        }
+            
 
     }
 }
