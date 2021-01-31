@@ -132,6 +132,7 @@ class rootomat {
         }
     
         this.imgUrl = URL.createObjectURL(document.getElementById("imageFile").files[0]);
+        this.fName = document.getElementById("imageFile").files[0].name.split('.').slice(0, -1).join('.');
         this.img = new Image()
         
         this.img.src = this.imgUrl;
@@ -155,7 +156,7 @@ class rootomat {
 
         
         var fontSize = 15
-        var texboxHeight = 2 * fontSize + 2//add little bit of margin
+        var texboxHeight = 3 * fontSize + 2//add little bit of margin
         var minWidth = 170
 
         var tmpCanvas = $("<canvas/>").attr({
@@ -195,13 +196,15 @@ class rootomat {
 
         //Line2
         tmpCtx.fillText(dateStr, 0, tmpCanvas.height - texboxHeight + (2 * fontSize));
+        //Line2
+        tmpCtx.fillText(scope.fName, 0, tmpCanvas.height - texboxHeight + (3 * fontSize));        
         //end add text
 
 
         var dateObj = new Date();
 
         var tmpLink = document.createElement('a');
-        tmpLink.download = 'plantomat' + dateStr + '.png';
+        tmpLink.download = scope.fName + '_rootomat' + dateStr + '.png';
         tmpLink.href = tmpCanvas.toDataURL("image/png");
         tmpLink.click();
     }
