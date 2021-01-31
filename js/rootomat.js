@@ -144,38 +144,64 @@ class rootomat {
     }
     downloadImg(selection, scope) {
 
+
+        var dateObj = new Date();
+        var dateStr =  dateObj.getFullYear() + "_" 
+        + (((dateObj.getMonth() + 1) < 10)?'0':'') + (dateObj.getMonth() + 1) + "_" 
+        + (((dateObj.getDate()) < 10)?'0':'') + dateObj.getDate() + "_" 
+        + (((dateObj.getHours()) < 10)?'0':'') + dateObj.getHours() + "_" 
+        + (((dateObj.getMinutes()) < 10)?'0':'') + dateObj.getMinutes() + "_" 
+        + (((dateObj.getSeconds()) < 10)?'0':'') + dateObj.getSeconds()
+
+        
+        var fontSize = 15
+        var texboxHeight = 2 * fontSize + 2//add little bit of margin
+        var minWidth = 170
+
         var tmpCanvas = $("<canvas/>").attr({
-            "width" : selection.x2 - selection.x1,
-            "height" : selection.y2 - selection.y1
+            "width" : (minWidth > (selection.x2 - selection.x1))?minWidth:(selection.x2 - selection.x1),
+            "height" : selection.y2 - selection.y1 + texboxHeight
         })
         tmpCanvas = tmpCanvas[0]
         var tmpCtx = tmpCanvas.getContext('2d')
+        tmpCtx.fillStyle = "white";
+        tmpCtx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+
+
 
         var tmpOrig = scope.origCtx.getImageData(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1)
         var tmpEdge = scope.edgeCtx.getImageData(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1)
 
-
+        var edgePx = 0;
         for(var i = 0; i < tmpOrig.data.length; i+=4) {
             if( tmpEdge.data[i + 3] != 0) {//it is not an alpha pixel
                 tmpOrig.data[i] = tmpEdge.data[i];
                 tmpOrig.data[i + 1] = tmpEdge.data[i + 1];
                 tmpOrig.data[i + 2] = tmpEdge.data[i + 2];
                 tmpOrig.data[i + 3] = tmpEdge.data[i + 3];
+                edgePx ++;
             }
         }
         tmpCtx.putImageData(tmpOrig, 0, 0);
         
 
+        //add text
+
+        tmpCtx.font = 'bold ' + fontSize + 'px Arial';
+        tmpCtx.fillStyle = 'black';
+
+        //Line1
+        tmpCtx.fillText("Edge pixel: " + edgePx + " px", 0, tmpCanvas.height - texboxHeight + fontSize);
+
+        //Line2
+        tmpCtx.fillText(dateStr, 0, tmpCanvas.height - texboxHeight + (2 * fontSize));
+        //end add text
+
+
         var dateObj = new Date();
 
         var tmpLink = document.createElement('a');
-        tmpLink.download = 'plantomat'
-                            + dateObj.getFullYear() + "_" 
-                            + (dateObj.getMonth() + 1) + "_" 
-                            + dateObj.getDate() + "_" 
-                            + dateObj.getHours() + "_" 
-                            + dateObj.getMinutes() + "_" 
-                            + dateObj.getSeconds() + '.png';
+        tmpLink.download = 'plantomat' + dateStr + '.png';
         tmpLink.href = tmpCanvas.toDataURL("image/png");
         tmpLink.click();
     }
@@ -208,8 +234,8 @@ class rootomat {
     getEdgePxCount() {
         var imageData = this.edgeCtx.getImageData(0, 0, this.edgeCanvas.width, this.edgeCanvas.height);
         var edgePx = 0
-        for (var pixel of imageData.data) {
-            if (pixel != 0)
+        for (var i=0; i < imageData.data.length; i+=4) {
+            if (imageData.data[i] != 0)
                 edgePx ++;
         }
         $("#allEdgePixel").html(edgePx + " px");
