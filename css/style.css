@@ -1,5 +1,19 @@
+html, body {
+    font-family: arial, sans-serif;
+    font-size: 15px;
+}
+
 .controlElements {
-    float:left
+    float:left;
+    padding-top: 10px;
+    padding: 2px;
+    margin : 2px;
+    border-left: solid 2px darkgray;
+    height: 100px;
+}
+
+.pixelCount {
+    font-weight: bold;
 }
 
 #placeholder {

@@ -7,6 +7,7 @@
     <script type="module" src="./submodules/jsfeat/build/jsfeat.js"></script>
     <script type="text/javascript" src="./js/radioClass.js"></script>
     <script type="text/javascript" src="./js/rectSelect.js"></script>
+    <script type="text/javascript" src="./js/colorPicker.js"></script>
     <script type="text/javascript" src="./js/rootomat.js"></script>
     <script type="text/javascript">
         var rootomatObj = Object;
@@ -15,6 +16,7 @@
         $( document ).ready(function() {
             rootomatObj = new rootomat();
             rootomatObj.createToolSelect("tool_select");
+            rootomatObj.createAdaptiveToolMenu("adaptiveToolMenu")
         })
     </script>
 </head>
@@ -22,26 +24,27 @@
     <div id ="placeholder">&nbsp;</div>
     <div id = "controls">
         <div  class="controlElements">
-            <button onclick="rootomatObj.init('image','edges')">Load image</button><br />
             <button onclick="rootomatObj.getEdgePxCount()">Calc pixel</button><br />
-
         </div>
         <div  class="controlElements">
             Status: <br />
             <img id="touchEn" src="./images/gesture-tap-button.svg" /><br />
         </div>
-        <div  class="controlElements">
-            Current pos<div id="currentPos"></div>
-        </div>
-        <div  class="controlElements" style="border: solid black 1px">
-        Last square:&nbsp;<div id="lastEdgePixel"></div>
-        All:&nbsp;<div id="allEdgePixel"></div>
-        </div>
-        <div  class="controlElements" style="border: solid black 1px">
-            <input type="file" id="imageFile" accept="image/jpg">
-        </div>
         <div class="controlElements" id="tool_select">
             Tools: <br />
+        </div>
+        <div id="adaptiveToolMenu" class="controlElements">
+            Tool options: <br />
+            
+
+        </div>
+        <div  class="controlElements" >
+        Last square:&nbsp;<div id="lastEdgePixel" class="pixelCount">&nbsp; px</div>
+        All:&nbsp;<div id="allEdgePixel" class="pixelCount">&nbsp; px</div>
+        </div>
+        <div  class="controlElements" >
+            <input type="file" id="imageFile" accept="image/jpg"><br />
+            <button onclick="rootomatObj.init('image','edges')">Load image</button>
         </div>
         <div style="clear: left;"></div>
     </div>

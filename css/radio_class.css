@@ -6,12 +6,23 @@
     margin : 2px;
 }
 
+.radio_select div {
+    width : 30px;
+    height : 30px;
+}
+
 .radio_select input{
     display: none;
 }
 
-.radio_select .selected {
+.radio_select .selected img{
     background-color: #ccc;
+}
+
+.radio_select .selected div{
+    width : 32px;
+    height : 32px;
+    margin : 2px;
 }
 
 

@@ -15,8 +15,10 @@ class rootomat {
     eraser = Object
     pencil = Object
     img = Object
+    colorPicker = Object
     absTopLeft = {"x" : 0, "y" : 0}
     toolSelect = Object
+    adaptiveToolMenu = Object
     modeSelect = ""
 
     constructor(imgUrl){
@@ -72,14 +74,21 @@ class rootomat {
 
     createToolSelect(domId){
         this.toolSelect = new radioClass(domId);
-        this.toolSelect.addElm("toolSelect","Select","rectSelect","rectSelect","./images/select-drag.svg")
-        this.toolSelect.addElm("toolSelect","Pencil","pencilSelect","pencilSelect","./images/lead-pencil.svg")
-        this.toolSelect.addElm("toolSelect","Pan","pan","pan","./images/pan.svg")
-        this.toolSelect.addElm("toolSelect","Download","download","download","./images/cloud-download-outline.svg")
-        this.toolSelect.addElm("toolSelect","Erase","erase","erase","./images/eraser.svg")
+        this.toolSelect.addElm("toolSelect","Select","rectSelect","rectSelect",{"path" : "./images/select-drag.svg"})
+        this.toolSelect.addElm("toolSelect","Pencil","pencilSelect","pencilSelect",{"path" : "./images/lead-pencil.svg"})
+        this.toolSelect.addElm("toolSelect","Pan","pan","pan",{"path" : "./images/pan.svg"})
+        this.toolSelect.addElm("toolSelect","Download","download","download",{"path" : "./images/cloud-download-outline.svg"})
+        this.toolSelect.addElm("toolSelect","Erase","erase","erase",{"path" : "./images/eraser.svg"})
         this.toolSelect.attachHandler(this.modeSwitch, this)
+        this.toolSelect.selectElm("rectSelect")
     }
 
+
+    createAdaptiveToolMenu(domId){
+        this.adaptiveToolMenu = $("#" + domId)
+
+        this.colorPicker = new colorPicker(domId);
+    }
 
 
     imageRead(origCanvas,edgeCanvas,that){
@@ -152,7 +161,7 @@ class rootomat {
             if (pixel != 0)
                 edgePx ++;
         }
-        $("#allEdgePixel").html(edgePx);
+        $("#allEdgePixel").html(edgePx + " px");
         //console.log("Total edge pixel: " + edgePx);
     }
 
@@ -179,20 +188,23 @@ class rootomat {
         jsfeat.imgproc.canny(img_u8, img_u8, 0, 12.5);
 
         // render result back to canvas
+        var color = this.colorPicker.getColor();
+        var colorInt = (color.alpha << 24) | (color.blue << 16) | (color.green << 8) | color.red;
+        
+
         var data_u32 = new Uint32Array(imageData.data.buffer);
-        var alpha = (0xff << 24);
         var i = img_u8.cols*img_u8.rows, pix = 0;
-        var black = 0
+        var nonAlpha = 0
         while(--i >= 0) {
             pix = img_u8.data[i];
             if(pix != 0){
-                data_u32[i] = alpha;
-                black ++;
+                data_u32[i] = colorInt;
+                nonAlpha ++;
             }else
                 data_u32[i] = 0;//alpha | (pix << 16) | (pix << 8) | pix;
             
         }
-        $("#lastEdgePixel").html(black);
+        $("#lastEdgePixel").html(nonAlpha + " px");
 
         this.edgeCtx.putImageData(imageData, startX, startY);
         

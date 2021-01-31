@@ -168,8 +168,6 @@ class rectSelect{
         if(that.rect.y1 == 0 || that.rect.x1 == 0)
             return;
 
-        $("#currentPos").html("x: " + x + "y: " + y + " offX: " + offsetX + " offY: " + offsetY);
-
         that.rect.x2 = x + $(document).scrollLeft() - offsetX;
         that.rect.y2 = y + $(document).scrollTop() - offsetY;
         if(that.size != -1) {

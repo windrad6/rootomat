@@ -9,30 +9,35 @@ class radioClass{
     domObj = Object
     handler = Object
     hanlderParam = Object
+    radioType = ""
 
 
     changeEventAttached = false
-    selectList = {} 
 
     constructor(domId) {
         this.domIdName = domId
         this.domObj = $("#" + domId);
 
-        $(this.domObj).attr("class", "radio_select")
+        $(this.domObj).addClass("radio_select")
 
     }
 
     changeEvent (e, that) {
         $(e.target).parent().find("label").removeClass("selected");
-        
         $(e.target).parent().find("label[for='"+e.target.id+"']").addClass("selected");
 
-        this.handler(e.target.id, this.hanlderParam);
+        that.handler(e.target.id, that.hanlderParam);
 
     }
 
+    selectElm(id) {
+        var e = {"target" : Object}
+        e.target = $(this.domObj).find("input[id='" + id + "']")[0]
+        this.changeEvent(e , this)
+    }
 
-    addElm(elmName, elmText, elmStyleClass, idIn, imgUrl) {
+
+    addElm(elmName, elmText, elmStyleClass, idIn, lableElm) {
 
         var that = this;
         $(this.domObj).append($("<input/>")
@@ -43,10 +48,22 @@ class radioClass{
         var tmpDom = $("<label/>").attr({
             for : idIn
         });
-        $(tmpDom).append($("<img>").attr({
-            class : elmStyleClass,
-            src : imgUrl
-        }));
+        if (typeof lableElm.path != "undefined"){
+            $(tmpDom).append($("<img>").attr({
+                class : elmStyleClass,
+                src : lableElm.path})
+            );
+            this.radioType = "img"
+        }else if (typeof lableElm.color != "undefined"){
+            $(tmpDom).append($("<div>")
+                .attr({
+                class : elmStyleClass})
+                .css({"background-color" : lableElm.color})
+                .html("&nbsp;")
+                );
+            this.radioType = "div"
+        }
+
 
         $(this.domObj).append(tmpDom)
         
