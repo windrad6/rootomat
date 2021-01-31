@@ -80,10 +80,15 @@ class rootomat {
         this.toolSelect = new radioClass(domId);
         this.toolSelect.addElm("toolSelect","Select","rectSelect","rectSelect",{"path" : "./images/select-drag.svg"})
         this.toolSelect.addElm("toolSelect","Pencil","pencilSelect","pencilSelect",{"path" : "./images/lead-pencil.svg"})
-        this.toolSelect.addElm("toolSelect","Pan","pan","pan",{"path" : "./images/pan.svg"})
+        //check wether it is a touch device or mouse system
+        if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0)
+            this.toolSelect.addElm("toolSelect","Pan","pan","pan",{"path" : "./images/pan.svg"})
         this.toolSelect.addElm("toolSelect","Download","download","download",{"path" : "./images/cloud-download-outline.svg"})
         this.toolSelect.addElm("toolSelect","Erase","erase","erase",{"path" : "./images/eraser.svg"})
         this.toolSelect.attachHandler(this.modeSwitch, this)
+        //check wether it is a touch device or mouse system
+        if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0)
+            this.toolSelect.selectElm("pan")//this is done to trigger the disable pan on mobile devices
         this.toolSelect.selectElm("rectSelect")
     }
 
