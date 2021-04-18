@@ -124,6 +124,9 @@ class rectSelect{
     mouseup(x, y, offsetX, offsetY, that) {
         if (!this.selfEn)return;
 
+        if (! that.checkRefElmPos(x, y))
+            return
+
         if(that.mouseupFcn !== null) {
             //correct if square is not done left to right
             if (that.rect.x1 > that.rect.x2) {
