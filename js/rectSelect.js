@@ -38,7 +38,7 @@ class rectSelect{
             var that = this;
             $("#canvasContainer").on('touchmove', function(e) {that.mousemove(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
             $("#canvasContainer").on('touchend', function(e) {that.mouseup(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
-            $("#canvasContainer").on('touchstart', function(e) {alert(e); that.mousedown(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
+            $("#canvasContainer").on('touchstart', function(e) {alert(JSON.stringify(e)); that.mousedown(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
         } else {
             var that = this;
             $("#canvasContainer").on('mousedown', function(e){that.mousedown(e.clientX, e.clientY, 0, 0, that);});
