@@ -1,6 +1,7 @@
 variables:
   EXCLUDE: "--exclude-glob .git* --exclude '.git/' --exclude './files --exclude './Readme.md'"
   SOURCE_DIR: "./"
+  GIT_SUBMODULE_STRATEGY: recursive
 
   # STAGING
   DEST_DIR: "/"
@@ -12,7 +13,7 @@ variables:
 deploy_master:
   stage: deploy
   script: 
-  - echo "Deploying"
+  - echo "Deploying"  
   - lftp -c "set ssl:verify-certificate no;open -u $USERNAME_STAGING,$PASSWORD_STAGING $HOST_STAGING; mirror -Rv --ignore-time --parallel=10 $EXCLUDE $SOURCE_DIR $DEST_DIR_STAGING"
   environment:
     name: production
