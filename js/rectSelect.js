@@ -94,7 +94,7 @@ class rectSelect{
 
     mousedown(x, y, offsetX, offsetY) {
 
-        if (!this.selfEn)return;
+        if (!this.selfEn) return;
 
         this.rect.x1 = x + $(document).scrollLeft() - offsetX;
         this.rect.y1 = y + $(document).scrollTop() - offsetY;
@@ -110,7 +110,7 @@ class rectSelect{
     }
 
     mouseup(x, y, offsetX, offsetY) {
-        if (!this.selfEn)return;
+        if (!this.selfEn) return;
 
         if(this.mouseupFcn !== null) {
             //correct if square is not done left to right
@@ -148,7 +148,7 @@ class rectSelect{
     }
 
     mousemove(x, y, offsetX, offsetY) {
-        if (!this.selfEn)return;
+        if (!this.selfEn) return;
 
         if(this.rect.y1 == 0 || this.rect.x1 == 0)
             return;
