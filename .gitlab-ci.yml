@@ -1,0 +1,22 @@
+variables:
+  EXCLUDE: "--exclude-glob .git* --exclude '.git/' --exclude './files --exclude './Readme.md'"
+  SOURCE_DIR: "./"
+
+  # STAGING
+  DEST_DIR: "/"
+  HOST_STAGING: "ftp://https://rootomat.de/"
+  USERNAME_STAGING: "manuelftp5"
+  PASSWORD_STAGING: "asofxpqweg"
+
+
+deploy_master:
+  stage: deploy
+  script: 
+  - echo "Deploying"
+  - lftp -c "set ssl:verify-certificate no;open -u $USERNAME_STAGING,$PASSWORD_STAGING $HOST_STAGING; mirror -Rv --ignore-time --parallel=10 $EXCLUDE $SOURCE_DIR $DEST_DIR_STAGING"
+  environment:
+    name: production
+    url: https://rootomat.de/
+  when: manual
+  only:
+  - master
