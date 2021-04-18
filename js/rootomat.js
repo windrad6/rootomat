@@ -10,6 +10,7 @@ class rootomat {
     edgeCanvas = Object
     origCtx = Object
     edgeCtx = Object
+    settingsObj = Object
     imgUrl = ""
     selector = Object
     eraser = Object
@@ -22,7 +23,10 @@ class rootomat {
     adaptiveToolMenu = Object
     modeSelect = ""
 
-    constructor(imgUrl){
+    constructor(settingsObjIn){
+
+        //attach global settings object to class
+        this.settingsObj = settingsObjIn;
 
         //check wether it is a touch device or mouse system
         if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0)
@@ -173,31 +177,54 @@ class rootomat {
         var tmpOrig = scope.origCtx.getImageData(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1)
         var tmpEdge = scope.edgeCtx.getImageData(selection.x1, selection.y1, selection.x2 - selection.x1, selection.y2 - selection.y1)
 
-        var edgePx = 0;
+        
+        var edgePx = {};
+
         for(var i = 0; i < tmpOrig.data.length; i+=4) {
             if( tmpEdge.data[i + 3] != 0) {//it is not an alpha pixel
                 tmpOrig.data[i] = tmpEdge.data[i];
                 tmpOrig.data[i + 1] = tmpEdge.data[i + 1];
                 tmpOrig.data[i + 2] = tmpEdge.data[i + 2];
                 tmpOrig.data[i + 3] = tmpEdge.data[i + 3];
-                edgePx ++;
+                
+                //count different colors
+                var pxColor = (tmpEdge.data[i]).toString() + "," + (tmpOrig.data[i + 1]).toString() + "," + (tmpOrig.data[i + 2]).toString();
+                if (edgePx[pxColor] == undefined)
+                    edgePx[pxColor] = 0;
+                edgePx[pxColor]++;
+        
             }
         }
         tmpCtx.putImageData(tmpOrig, 0, 0);
         
+        if(scope.settingsObj.exists("multiColor") && !scope.settingsObj.get( "multiColor")) {
+            var tmpEdgePx = 0;
+            for (let key in edgePx) {
+                tmpEdgePx += edgePx[key];
+            }
+
+            edgePx = {};
+            edgePx["0,0,0"] = tmpEdgePx;
+        }
 
         //add text
-
         tmpCtx.font = 'bold ' + fontSize + 'px Arial';
         tmpCtx.fillStyle = 'black';
-
         //Line1
-        tmpCtx.fillText("Edge pixel: " + edgePx + " px", 0, tmpCanvas.height - texboxHeight + fontSize);
-
+        tmpCtx.fillText("Edge pixel: ", 0, tmpCanvas.height - texboxHeight + fontSize);
         //Line2
         tmpCtx.fillText(dateStr, 0, tmpCanvas.height - texboxHeight + (2 * fontSize));
         //Line2
-        tmpCtx.fillText(scope.fName, 0, tmpCanvas.height - texboxHeight + (3 * fontSize));        
+        tmpCtx.fillText(scope.fName, 0, tmpCanvas.height - texboxHeight + (3 * fontSize));
+
+        var tWidth = tmpCtx.measureText("Edge pixel: ").width;
+
+        for (let key in edgePx) {
+            tmpCtx.fillStyle = 'rgb(' + key + ')';
+            tmpCtx.fillText(edgePx[key] + " px ", tWidth, tmpCanvas.height - texboxHeight + fontSize);
+            tWidth += tmpCtx.measureText(edgePx[key] + " px ").width;
+
+        }
         //end add text
 
 

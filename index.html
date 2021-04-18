@@ -6,16 +6,18 @@
     <link rel="stylesheet" href="css/radio_class.css" type="text/css" media="screen" />
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="module" src="./submodules/jsfeat/build/jsfeat.js"></script>
+    <script type="text/javascript" src="./js/settings.js"></script>
     <script type="text/javascript" src="./js/radioClass.js"></script>
     <script type="text/javascript" src="./js/rectSelect.js"></script>
     <script type="text/javascript" src="./js/colorPicker.js"></script>
     <script type="text/javascript" src="./js/rootomat.js"></script>
     <script type="text/javascript">
         var rootomatObj = Object;
-        var test = Object;
+        var settingsObj = Object;
 
         $( document ).ready(function() {
-            rootomatObj = new rootomat();
+            settingsObj = new settings();
+            rootomatObj = new rootomat(settingsObj);
             rootomatObj.createToolSelect("tool_select");
             rootomatObj.createAdaptiveToolMenu("adaptiveToolMenu")
         })
