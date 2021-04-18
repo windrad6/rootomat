@@ -35,7 +35,7 @@ class rectSelect{
 
         //check wether it is a touch device or mouse system
         if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0){
-            $("#canvasContainer")[0].addEventListener('touchmove',(e) => {that.mousemove(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset);});
+            $("#canvasContainer")[0].addEventListener('touchmove',(e) => {this.mousemove(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset);});
             $("#canvasContainer")[0].addEventListener('touchend',(e) => {this.mouseup(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset);});
             $("#canvasContainer")[0].addEventListener('touchstart',(e) => {this.mousedown(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset);});
         } else {
