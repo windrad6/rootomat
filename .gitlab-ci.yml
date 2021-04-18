@@ -4,7 +4,7 @@ variables:
 
   # STAGING
   DEST_DIR: "/"
-  HOST_STAGING: "ftp://https://rootomat.de/"
+  HOST_STAGING: "ftp://rootomat.de/"
   USERNAME_STAGING: "manuelftp5"
   PASSWORD_STAGING: "asofxpqweg"
 
