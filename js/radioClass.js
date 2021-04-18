@@ -57,7 +57,7 @@ class radioClass{
         }else if (typeof lableElm.color != "undefined"){
             $(tmpDom).append($("<div>")
                 .attr({
-                class : elmStyleClass})
+                    class : elmStyleClass})
                 .css({"background-color" : lableElm.color})
                 .html("&nbsp;")
                 );
@@ -66,8 +66,6 @@ class radioClass{
 
 
         $(this.domObj).append(tmpDom)
-        
-        var that = this;
     }
 
     attachHandler(handler, param) {
