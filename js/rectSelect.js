@@ -103,9 +103,9 @@ class rectSelect{
 
         if (!this.selfEn)return;
 
-        if (! this.checkRefElmPos(x, y))
+        /*if (!this.checkRefElmPos(x, y))
             return
-
+*/
         this.rect.x1 = x + $(document).scrollLeft() - offsetX;
         this.rect.y1 = y + $(document).scrollTop() - offsetY;
 
@@ -122,9 +122,9 @@ class rectSelect{
     mouseup(x, y, offsetX, offsetY) {
         if (!this.selfEn)return;
 
-        if (! this.checkRefElmPos(x, y))
+        /*if (!this.checkRefElmPos(x, y))
             return
-
+*/
         if(this.mouseupFcn !== null) {
             //correct if square is not done left to right
             if (this.rect.x1 > this.rect.x2) {
@@ -163,9 +163,9 @@ class rectSelect{
     mousemove(x, y, offsetX, offsetY) {
         if (!this.selfEn)return;
 
-        if (!this.checkRefElmPos(x, y))
+        /*if (!this.checkRefElmPos(x, y))
             return;
-
+*/
         if(this.rect.y1 == 0 || this.rect.x1 == 0)
             return;
 
