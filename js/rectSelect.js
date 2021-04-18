@@ -36,14 +36,14 @@ class rectSelect{
         //check wether it is a touch device or mouse system
         if('ontouchstart' in window  /*|| navigator.maxTouchPoints > 0*/ || navigator.msMaxTouchPoints > 0){
             var that = this;
-            document.addEventListener('touchmove',function(e) {that.mousemove(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
-            document.addEventListener('touchend',function(e) {that.mouseup(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
-            document.addEventListener('touchstart',function(e) {that.mousedown(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
+            $("#canvasContainer").on('touchmove', function(e) {that.mousemove(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
+            $("#canvasContainer").on('touchend', function(e) {that.mouseup(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
+            $("#canvasContainer").on('touchstart', function(e) {that.mousedown(e.pageX, e.pageY, window.pageXOffset, window.pageYOffset, that);});
         } else {
             var that = this;
-            $("#canvasContainer").mousedown(function(e){that.mousedown(e.clientX, e.clientY, 0, 0, that);});
-            $("#canvasContainer").mouseup(function(e){that.mouseup(e.clientX, e.clientY, 0, 0, that);});
-            $("#canvasContainer").mousemove(function(e){that.mousemove(e.clientX, e.clientY, 0, 0, that);});
+            $("#canvasContainer").on('mousedown', function(e){that.mousedown(e.clientX, e.clientY, 0, 0, that);});
+            $("#canvasContainer").on('mouseup', function(e){that.mouseup(e.clientX, e.clientY, 0, 0, that);});
+            $("#canvasContainer").on('mousemove', function(e){that.mousemove(e.clientX, e.clientY, 0, 0, that);});
         }
 
         
