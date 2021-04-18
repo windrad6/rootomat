@@ -67,31 +67,24 @@ class rectSelect{
         this.refElm.y2 = offset.top + $(this.refDomObj).height();
     }
 
-    //check if mouse is outside the reference elm (elmId from constructor)
-    checkRefElmPos(x , y) {
-        if (x < this.refElm.x1 || x > this.refElm.x2 || y < this.refElm.y1 || y > this.refElm.y2 )
-            return false;
-        return true;
-    }
-
     //calc a new div whis the current pos
     calcDiv() {
-        var x3 = Math.min(this.rect.x1,this.rect.x2);
-        var x4 = Math.max(this.rect.x1,this.rect.x2);
-        var y3 = Math.min(this.rect.y1,this.rect.y2);
-        var y4 = Math.max(this.rect.y1,this.rect.y2);
+        var x1 = Math.min(this.rect.x1,this.rect.x2);
+        var x2 = Math.max(this.rect.x1,this.rect.x2);
+        var y1 = Math.min(this.rect.y1,this.rect.y2);
+        var y2 = Math.max(this.rect.y1,this.rect.y2);
 
-        this.rectDomObj.css("left", x3 + 'px');
-        this.rectDomObj.css("top", y3 + 'px');
-        this.rectDomObj.css("width", x4 - x3 + 'px');
-        this.rectDomObj.css("height",  y4 - y3 + 'px');
+        this.rectDomObj.css("left", x1 + 'px');
+        this.rectDomObj.css("top", y1 + 'px');
+        this.rectDomObj.css("width", x2 - x1 + 'px');
+        this.rectDomObj.css("height",  y2 - y1 + 'px');
     }
 
     calcCircle() {
-        var x3 = Math.min(this.rect.x1,this.rect.x2);
-        var x4 = Math.max(this.rect.x1,this.rect.x2);
-        var y3 = Math.min(this.rect.y1,this.rect.y2);
-        var y4 = Math.max(this.rect.y1,this.rect.y2);
+        var x1 = Math.min(this.rect.x1,this.rect.x2);
+        var x2 = Math.max(this.rect.x1,this.rect.x2);
+        var y1 = Math.min(this.rect.y1,this.rect.y2);
+        var y2 = Math.max(this.rect.y1,this.rect.y2);
 
         this.rectDomObj.css("left", this.rect.x2 - this.size/2 + 'px');
         this.rectDomObj.css("top", this.rect.y2 - this.size/2 + 'px');
@@ -103,9 +96,6 @@ class rectSelect{
 
         if (!this.selfEn)return;
 
-        /*if (!this.checkRefElmPos(x, y))
-            return
-*/
         this.rect.x1 = x + $(document).scrollLeft() - offsetX;
         this.rect.y1 = y + $(document).scrollTop() - offsetY;
 
@@ -122,9 +112,6 @@ class rectSelect{
     mouseup(x, y, offsetX, offsetY) {
         if (!this.selfEn)return;
 
-        /*if (!this.checkRefElmPos(x, y))
-            return
-*/
         if(this.mouseupFcn !== null) {
             //correct if square is not done left to right
             if (this.rect.x1 > this.rect.x2) {
@@ -163,9 +150,6 @@ class rectSelect{
     mousemove(x, y, offsetX, offsetY) {
         if (!this.selfEn)return;
 
-        /*if (!this.checkRefElmPos(x, y))
-            return;
-*/
         if(this.rect.y1 == 0 || this.rect.x1 == 0)
             return;
 
